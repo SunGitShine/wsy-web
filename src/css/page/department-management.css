@@ -1,0 +1,56 @@
+.depart-content {
+  position: relative; }
+  .depart-content .add-btn {
+    position: absolute;
+    right: 0;
+    top: 0; }
+  .depart-content .tbn-div {
+    position: relative;
+    height: 50px; }
+    .depart-content .tbn-div label {
+      margin-left: 30px;
+      line-height: 32px; }
+
+.w-150 {
+  width: 150px !important; }
+
+.w-120 {
+  width: 120px !important; }
+
+.h-100 {
+  height: 100px !important; }
+
+.handle-a {
+  color: #4a9df8;
+  margin-right: 20px; }
+  .handle-a:active {
+    color: #108ee9; }
+
+.commodity-img {
+  width: 80px;
+  height: 80px;
+  margin: 10px 0; }
+
+.m-l-20 {
+  margin-left: 20px !important; }
+
+.left-label {
+  width: 70px;
+  display: inline-block;
+  text-align: right;
+  margin-right: 20px; }
+
+.m-t-10 {
+  margin-top: 10px !important; }
+
+.w-245 {
+  width: 245px !important; }
+
+.w-168 {
+  width: 168px !important; }
+
+.total-num {
+  text-align: right;
+  padding-right: 150px; }
+
+/*# sourceMappingURL=department-management.css.map */

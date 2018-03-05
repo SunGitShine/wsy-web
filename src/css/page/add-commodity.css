@@ -1,0 +1,40 @@
+@charset "UTF-8";
+.add-commodity .ant-upload.ant-upload-select-picture-card > .ant-upload {
+  display: table; }
+.add-commodity .avatar-uploader-trigger {
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 28px;
+  color: #999; }
+.add-commodity .anticon-eye-o:before {
+  content: "↻";
+  font-size: 18px; }
+
+.add-content {
+  padding: 20px 0 50px 100px; }
+
+.left-label {
+  width: 70px;
+  display: inline-block;
+  text-align: right;
+  margin-right: 20px; }
+
+.m-t-10 {
+  margin-top: 10px; }
+
+.w-168 {
+  width: 168px !important; }
+
+.w-50 {
+  width: 50px !important; }
+
+.w-245 {
+  width: 245px !important; }
+
+.add-cancel-btn {
+  margin: 0 100px 0 110px !important; }
+
+.p-l-100 {
+  padding-left: 100px; }
+
+/*# sourceMappingURL=add-commodity.css.map */

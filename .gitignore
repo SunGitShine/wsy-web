@@ -1,0 +1,10 @@
+.idea
+*.css.map
+node_modules
+.orig
+dist
+webpack.config.hot.js
+demo.html
+entry.config.js
+*.orig
+*.log

@@ -1,0 +1,56 @@
+.upload-div{
+  border: 1px dashed #d9d9d9;
+  width: 96px;
+  height: 96px;
+  border-radius: 4px;
+  background-color: #fbfbfb;
+  text-align: center;
+  -webkit-transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease;
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  &:hover{
+    border-color:#108ee9
+  }
+  .upload-trigger{
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 28px;
+    color: #999;
+    width: 150px;
+    font-style: normal;
+    &:before{
+      line-height: 94px;
+      font-family: "anticon" !important;
+      display: block;
+      content: "\E627";
+    }
+  }
+  .upload-img{
+    margin: 5px 0;
+    height: 86px;
+    width: 86px;
+    border-radius: 4px;
+  }
+  .mask{
+    position: absolute;
+    background-color: #000;
+    opacity: .3;
+    height: 25px;
+    width: 86px;
+    bottom: 5px;
+    right: 5px;
+  }
+  .mask-text{
+    position: absolute;
+    bottom: 5px;
+    color: #fff;
+    width:100%;
+    text-align: center;
+    .text{
+      margin-left: 15px;margin-right: 5px;
+    }
+  }
+}

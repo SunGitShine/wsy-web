@@ -1,0 +1,61 @@
+html, body, div, h5, h6, p, ul, li {
+    margin: 0px;
+    padding: 0px;
+}
+html{
+    font-size: 14px;
+    background-color: #ccc;
+}
+body,html{
+    height: 100%;
+}
+
+ul{
+    list-style: none;
+}
+.left{float: left;}
+.right{float:right;}
+.clearfix:after{content:"";display:block;height:0;clear:both;visibility:hidden}
+.relative{
+    position: relative;
+}
+.table{
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    tr{
+        &:hover{
+            background-color: #f2f2f2;
+        }
+    }
+    td{
+        border:1px solid #ccc;
+        height:40px;
+    }
+}
+.require{
+    color:red;
+}
+#app{
+    height:100%;
+}
+.m-t-30{
+    margin-top: 30px;
+}
+.w-80{
+    width:80px !important;
+}
+.rui-input[disabled],.rui-textarea[disabled] {
+    background-color: #f2f2f2;
+}
+.bg-red{
+    background-color: red;
+}
+.no-data{
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+}
+.ant-calendar-picker-container{
+    z-index: 99999 !important;
+}

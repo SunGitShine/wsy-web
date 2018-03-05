@@ -1,0 +1,54 @@
+.header-div {
+  height: 60px;
+  width: 100%;
+  border: 1px solid  #ccc; }
+  .header-div h1 {
+    font-size: 32px;
+    line-height: 60px;
+    padding-left: 50px; }
+
+.header-bread {
+  height: 50px;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-left: none; }
+
+.line-50 {
+  line-height: 50px; }
+
+.login-out {
+  font-size: 18px;
+  text-align: center;
+  position: absolute;
+  height: 60px;
+  width: 100px;
+  right: 0;
+  top: 0;
+  line-height: 60px; }
+  .login-out a {
+    color: #333; }
+
+.page-content {
+  padding: 30px 10px 100px 10px;
+  paddingBottom: 100px;
+  background-color: #fff; }
+  .page-content .footer {
+    position: fixed;
+    z-index: 1010;
+    bottom: 0;
+    left: 182px;
+    right: 0;
+    height: 60px;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+    padding: 0 29px;
+    line-height: 60px; }
+  .page-content .rui-pagination-detail {
+    line-height: 60px !important; }
+  .page-content .rui-icon {
+    vertical-align: middle !important; }
+
+.right-page {
+  margin-left: 182px; }
+
+/*# sourceMappingURL=header.css.map */

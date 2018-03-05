@@ -1,0 +1,55 @@
+.header-div{
+  height: 60px;
+  width: 100%;
+  border:1px solid  #ccc;
+  h1{
+    font-size: 32px;
+    line-height: 60px;
+    padding-left: 50px;
+  }
+}
+.header-bread{
+  height: 50px;
+  border: 1px solid #ccc;border-top:none;border-left: none;
+}
+.line-50{
+  line-height: 50px;
+}
+.login-out{
+  font-size: 18px;
+  text-align: center;
+  position: absolute;
+  height: 60px;
+  width: 100px;
+  right: 0;
+  top: 0;
+  line-height: 60px;
+  a{
+    color:#333;
+  }
+}
+.page-content{
+  padding: 30px 10px 100px 10px;
+  background-color: #fff;
+  .footer{
+    position: fixed;
+    z-index: 1010;
+    bottom: 0;
+    left: 182px;
+    right: 0;
+    height: 60px;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+    padding: 0 29px;
+    line-height: 60px;
+  }
+  .rui-pagination-detail{
+    line-height: 60px !important;
+  }
+  .rui-icon{
+    vertical-align: middle!important;
+  }
+}
+.right-page{
+  margin-left: 182px;
+}

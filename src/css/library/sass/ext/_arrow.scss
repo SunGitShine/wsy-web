@@ -1,0 +1,22 @@
+/**
+* Created with JetBrains WebStorm.
+* User: guofan
+* Date: 2016/1/7
+* Time: 20:53
+*/
+/* -------------------------------------------------
+ * arrow scss
+ * -------------------------------------------------
+*/
+// 变量
+//----------------------------------
+//$arrowDirection:           right !default; //箭头的朝向
+//$arrowWidth:               10px !default; //箭头的宽度
+//$arrowColor:               #ccc !default; //箭头的颜色
+
+@mixin arrow($arrowDirection:right,$arrowWidth:10px,$arrowColor:#ccc) {
+  width:0;
+  height:0;
+  border: #{$arrowWidth} solid transparent;
+  border-#{$arrowDirection}: #{$arrowWidth}  solid #{$arrowColor};
+}

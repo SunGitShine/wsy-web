@@ -1,0 +1,33 @@
+
+@import '../library/sass/_function';
+@import "../library/sass/ext/animate/fade";
+@include animate-fadeInDown;
+.web-tip {
+  position:fixed;
+  top:50%;
+  left:50%;
+  max-width:800px;
+  padding:27px 30px;
+  border: 1px solid #dfdfdf;
+  @include box-shadow(0 0 2px 2px #eee);
+  @include border-radius(6px);
+  font-size:14px;
+  z-index:$zindexMessage +1;
+  background-color:#fff;
+  text-indent: 27px;
+  &.show {
+    @extend .fadeInDown;
+  }
+  &.wrong {
+    background:#fff url('../../images/layout/message_wrong.png') 27px 29px no-repeat;
+    color:#333;
+  }
+  &.warn {
+    background:#fff url('../../images/layout/message_warn.png') 27px 29px no-repeat;
+    color:#333;
+  }
+  &.success {
+    background:#fff url('../../images/layout/message_success.png') 27px 29px no-repeat;
+    color:#333;
+  }
+}
