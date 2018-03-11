@@ -24,8 +24,8 @@ const Header = React.createClass({
     },
     render(){
         return(
-            <div>
-                <div className="header-div">
+            <div className="no-print">
+                <div className="header-div ">
                     <h1>舞思韵后台管理系统</h1> 
                 </div>
                 <div className="header-bread">

@@ -1,16 +1,37 @@
 .depart-content .tbn-div label{
-    margin-left: 0;
+    margin-left: 10px;
 }
 .left-label{
     margin: 0;
-    width: 60px;
+    width: 70px;
     text-align: center;
-}
-.m-t-10 {
-    display: inline-block;
-    width: 220px;
 }
 .depart-content .tbn-div{
     padding-bottom: 20px;
     height: auto;
+}
+.super-item{
+    padding: 16px 0;
+    position: relative;
+    border: 1px solid #ccc;
+    border-bottom:none; 
+}
+.super-item div{
+    position: absolute;
+    top: 5px;
+    right: 0;
+    width: 160px;
+    display: inline-block;
+    text-align: center;
+}
+.super-item div:first-child{
+    right: 170px;
+}
+.tbn-div .m-t-10{
+    display: inline-block;
+}
+.button-item{
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 10px;
 }

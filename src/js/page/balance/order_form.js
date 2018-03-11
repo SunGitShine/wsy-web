@@ -7,14 +7,17 @@ class OrderForm extends React.Component{
     constructor(props){
         super(props)
         let opType = this.props.location.query.opType;
-        let moneyNo = {b:"",m:"",w:"",q:"",h:"",t:"",y:"",j:"",f:""};
+        opType = parseInt(opType);
+        let moneyNo = ["","","","","","","","",""];
         let productsItem = {
             productName:"",
             productNum:"",
             artNo:"",
+            totalMoney:"",
             productPrice:""
         };
         this.state = {
+            roleFlag:localStorage.type,
             dataType:0,
             editFlag:opType,
             request:{
@@ -24,18 +27,61 @@ class OrderForm extends React.Component{
                 deliveryAddress:"",
                 orderNo:"",
                 totalMoney:"",
+                totalMoneyB:"",
                 totalNum:"",
-                products:[productsItem,productsItem,productsItem,productsItem,productsItem]
+                products:[
+                    {
+                        productName:"",
+                        productNum:"",
+                        artNo:"",
+                        totalMoney:"",
+                        productPrice:""
+                    },
+                    {
+                        productName:"",
+                        productNum:"",
+                        artNo:"",
+                        totalMoney:"",
+                        productPrice:""
+                    },
+                    {
+                        productName:"",
+                        productNum:"",
+                        artNo:"",
+                        totalMoney:"",
+                        productPrice:""
+                    },
+                    {
+                        productName:"",
+                        productNum:"",
+                        artNo:"",
+                        totalMoney:"",
+                        productPrice:""
+                    },
+                    {
+                        productName:"",
+                        productNum:"",
+                        artNo:"",
+                        totalMoney:"",
+                        productPrice:""
+                    }
+                ]
             },
-            moneyList:[moneyNo,moneyNo,moneyNo,moneyNo,moneyNo,moneyNo],
             sumData:{
                 times:[],
                 sumMoney:"",
-                moneyList:"",
+                moneyList:[
+                    ["","","","","","","","",""],
+                    ["","","","","","","","",""],
+                    ["","","","","","","","",""],
+                    ["","","","","","","","",""],
+                    ["","","","","","","","",""],
+                    ["","","","","","","","",""]],
                 createBy:""
             }
         }
-        this.submit = this.submit.bind(this);
+        this.addSonItem = this.addSonItem.bind(this);
+        
     }    
     componentWillMount(){
         let {editFlag} = this.state;
@@ -52,6 +98,7 @@ class OrderForm extends React.Component{
         let _this = this;
         let id= this.props.location.query.id;
         let {request,sumData} = _this.state;
+        sumData.moneyList = [];
         $.ajax({
             url:commonBaseUrl+"/balance/getReceipt.htm",
             type:"get",
@@ -59,6 +106,7 @@ class OrderForm extends React.Component{
             data:{d:JSON.stringify({"orderNo":id})},
             success(data){
                 if(data.success){
+                    let mLenth = 9;
                     request.customerName = data.resultMap.receiptDO.customerName;
                     request.customerPhone = data.resultMap.receiptDO.customerPhone;
                     request.deliveryAddress = data.resultMap.receiptDO.deliveryAddress;
@@ -66,21 +114,93 @@ class OrderForm extends React.Component{
                     request.orderNo = data.resultMap.receiptDO.orderNo;
                     request.totalNum = data.resultMap.receiptDO.totalNum;
                     request.products = data.resultMap.receiptDO.products;
-                    for(let i = 0 ;i<request.products;i++){
+                    request.totalMoney = data.resultMap.receiptDO.totalMoney;
+                    for(let i = 0 ;i<request.products.length;i++){
+                        sumData.moneyList.push(request.products[i].totalMoney);
                         request.products[i].productPrice = request.products[i].productPrice/100;
+                        request.products[i].totalMoney = request.products[i].totalMoney/100;
                     }
                     let time = moment(data.resultMap.receiptDO.createTime);
                     sumData.times=[time.years(),time.months()+1,time.dates()];
-                    sumData.moneyList = data.resultMap.receiptDO.products;
+                    sumData.createBy = data.resultMap.receiptDO.createUser;
+                    for(let j = 0;j<sumData.moneyList.length;j++){
+                        var lenth = (sumData.moneyList[j]+"").length;
+                        var mArr= [];
+                        var nArr= [];
+                        for(var k = 0;k<(mLenth-lenth);k++){
+                            mArr.push("");
+                        }
+                        nArr = (sumData.moneyList[j]+"").split("");
+                        mArr = mArr.concat(nArr);
+                        sumData.moneyList[j] = mArr;
+                    }
+                    var tLenth = (request.totalMoney+"").length;
+                    var tArr = [];
+                    for(let n = 0;n<(mLenth-tLenth);n++){
+                        tArr.push("");
+                    }
+                    tArr = tArr.concat((request.totalMoney+"").split(""));
+                    for(let m = 0;m < tArr.length;m++){
+                        if(tArr[m]==""){
+                            tArr[m] = "-";
+                        }else if(tArr[m] == "0"){
+                            tArr[m] = "零";
+                        }else if(tArr[m]=="1"){
+                            tArr[m] = "壹";    
+                        }else if(tArr[m]=="2"){
+                            tArr[m] = "贰";    
+                        }else if(tArr[m]=="3"){
+                            tArr[m] = "叁";   
+                        }else if(tArr[m]=="4"){
+                            tArr[m] = "肆";    
+                        }else if(tArr[m]=="5"){
+                            tArr[m] = "伍";    
+                        }else if(tArr[m]=="6"){
+                            tArr[m] = "陆";    
+                        }else if(tArr[m]=="7"){
+                            tArr[m] = "柒";    
+                        }else if(tArr[m]=="8"){
+                            tArr[m] = "捌";    
+                        }else if(tArr[m]=="9"){
+                            tArr[m] = "玖";    
+                        }
+
+                    }
+                    request.totalMoneyB = tArr;
+                    request.totalMoney = request.totalMoney/100;
+                    sumData.moneyList.push("");
                     _this.setState({});
                 }else{
 
                 }
             }
         });
+
+    }
+    componentDidUpdate(){
+        let {dataType }= this.state;
+        let h;
+        if(dataType == 0){
+            h = $(".receipt-left-0").height()-39;
+        }else{
+            h = $(".receipt-left").height()-39;
+        }
+        $(".receipt-remark-content").height(h);
     }
     submit(){
+        let num = this.props.location.query.id;
         window.print();
+        $.ajax({
+            url:commonBaseUrl+"/balance/print.htm",
+            type:"get",
+            dataType:"json",
+            data:{d:JSON.stringify({orderNo:num})},
+            success:function(results){
+                if(results.success){
+                    // Pubsub.publish("showMsg",["success","操作成功"]);
+                }
+            }
+        })
     }
     //修改单据
     updateData(){
@@ -91,12 +211,16 @@ class OrderForm extends React.Component{
             if(request.products[i].productName !== "" && request.products[i].productNum !== ""){
                 request.products[i].productPrice = parseInt(request.products[i].productPrice)*100;
                 arr.push(request.products[i]);
+            }else if(request.products[i].productName !== "" || request.products[i].productNum !== ""){
+                Pubsub.publish("showMsg",["wrong","名称和数量为必填项"]);
+                return;
             }
         }
         request.products = arr;
         $.post(commonBaseUrl+url,{d:JSON.stringify(request)},function (results) {
             if(results.success){
-                Pubsub.publish("showMsg",["success","操作成功"]);
+                Pubsub.publish("showMsg",["success","操作成功"]);               
+                hashHistory.push("/deliverynote");
             }else{
                 Pubsub.publish("showMsg",["wrong","操作失败"]);
             }
@@ -112,12 +236,16 @@ class OrderForm extends React.Component{
             if(request.products[i].productName !== "" && request.products[i].productNum !== ""){
                 request.products[i].productPrice = parseInt(request.products[i].productPrice)*100;
                 arr.push(request.products[i]);
+            }else if(request.products[i].productName !== "" || request.products[i].productNum !== ""){
+                Pubsub.publish("showMsg",["wrong","名称和数量为必填项"]);
+                return;
             }
         }
         request.products = arr;
         $.post(commonBaseUrl+url,{d:JSON.stringify(request)},function (results) {
             if(results.success){
                 Pubsub.publish("showMsg",["success","操作成功"]);
+                hashHistory.push("/deliverynote");
             }else{
                 Pubsub.publish("showMsg",["wrong","操作失败"]);
             }
@@ -129,17 +257,50 @@ class OrderForm extends React.Component{
         request[type] = e.target.value;
         this.setState({});
     }
-
-    listChange(type,sonIndex,e){
+    listChange(type,someIndex,e){
         let {request} = this.state;
-        request.products[sonIndex][type] = e.target.value;
+        request.products[someIndex][type] = e.target.value; 
         this.setState({});
+    }
+    addSonItem(){
+        let {sumData,request} = this.state;
+        request.products.push({
+            productName:"",
+            productNum:"",
+            artNo:"",
+            totalMoney:"",
+            productPrice:""
+        });
+        sumData.moneyList.push("");
+        this.setState({sumData,request});
+    }
+    removeSonItem(index){
+        let {sumData,request} = this.state;
+        request.products.splice(index,1);
+        sumData.moneyList.splice(index,1);
+        this.setState({sumData,request});
+    }
+    // 发送短信给客户
+    senMsg(){
+        let num = this.props.location.query.id;
+        $.ajax({
+            url:commonBaseUrl+"/balance/sendMsg.htm",
+            type:"get",
+            dataType:"json",
+            data:{d:JSON.stringify({orderNo:num})},
+            success:function(results){
+                if(results.success){
+                    Pubsub.publish("showMsg",["success","发送成功"]);
+                }
+            }
+        })
     }
     render(){
         var openKey = 4;
         var currentKey = 10;
         var typeFlag = localStorage.type;
-        let {request,dataType,moneyList,editFlag,sumData} = this.state;
+        let {request,dataType,editFlag,sumData,roleFlag} = this.state;
+        let orderNo = request.orderNo;
         let createBtn;
         if(editFlag == 0){
             createBtn = "";            
@@ -148,52 +309,54 @@ class OrderForm extends React.Component{
         }else{
             createBtn = (<RUI.Button className = "primary" onClick = {this.createData.bind(this)} >创建</RUI.Button>);
         }
-       
+        let fontSize = "18px;";
         return(
             
-            <Layout currentKey = {currentKey+""} defaultOpen={openKey+""} bread = {["结算管理","送货单管理"]}>
-                <div className="m-b-20 not-print">
-                    <RUI.Button className = {typeFlag==1?"primary next-btn order_active":"primary next-btn "}
+            <Layout currentKey = "10" defaultOpen={"3"} bread = {["结算管理","送货单管理"]}>
+               
+                <div className="m-b-20 no-print center-btn">
+                    <RUI.Button className = {dataType ==1?"primary next-btn":"primary next-btn order_active"}
                                         onClick = {this.typeSwitch.bind(this,1)}>送货单</RUI.Button>
-                    <RUI.Button className = {typeFlag==1?"primary next-btn order_active":"primary next-btn"}
-                                        onClick = {this.typeSwitch.bind(this,0)}>收据</RUI.Button>
+                   { roleFlag == 1 &&<RUI.Button className = {dataType ==1?"primary next-btn order_active":"primary next-btn "}
+                                        onClick = {this.typeSwitch.bind(this,0)}>收据</RUI.Button>}
                 </div>
-                <div className="receipt-content">
+                <div id="printPage" className={editFlag ==0?"receipt-content active":"receipt-content"}>
                     <div className="receipt-title">
                         {dataType == 0 ? (<p>舞思韵送货单</p>) : (<p>舞思韵收款收据</p>)}
-                        <span className="receipt-num">{"NO."+request.orderNo}</span>
+                        <span className="receipt-num"><span style={{fontSize:18}}>NO.</span>{+request.orderNo}</span>
                     </div>
                     {   dataType == 1?
                         (<div className="receipt-top">
-                            <label>客户名称</label>
+                            <label>客户名称：</label>
                             <input disabled ={editFlag ==0?"disabled":""} className="lab" type="text" value={request.customerName} onChange={this.handleInput.bind(this,"customerName")}/>
                             <ul className="receipt-date">
-                                <li>{sumData.times[0]}年</li>
-                                <li>{sumData.times[1]}月</li>
-                                <li>{sumData.times[2]}日</li>
+                                <li>{sumData.times[0]}&nbsp;&nbsp;&nbsp;&nbsp;年</li>
+                                <li>{sumData.times[1]}&nbsp;&nbsp;&nbsp;&nbsp;月</li>
+                                <li>{sumData.times[2]}&nbsp;&nbsp;&nbsp;&nbsp;日</li>
                             </ul>
                         </div>):(
                             <div className="receipt-top-0">
                             <ul className="receipt-date">
-                                <li>{sumData.times[0]}年</li>
-                                <li>{sumData.times[1]}月</li>
-                                <li>{sumData.times[2]}日</li>
+                                <li>{sumData.times[0]}&nbsp;&nbsp;&nbsp;&nbsp;年</li>
+                                <li>{sumData.times[1]}&nbsp;&nbsp;&nbsp;&nbsp;月</li>
+                                <li>{sumData.times[2]}&nbsp;&nbsp;&nbsp;&nbsp;日</li>
                             </ul>
                             <ul className="user-info">
-                                <li>
-                                    <label>订单名称</label>
+                                {editFlag ==0?"":<li>
+                                    <label>订单名称：</label>
                                     <input disabled ={editFlag ==0?"disabled":""} className="lab"  type="text" value={request.orderName} onChange={this.handleInput.bind(this,"orderName")}/> 
                                 </li>
+                                }
                                 <li className="user-info-item">
-                                    <label>客户名称</label>
+                                    <label>客户名称：</label>
                                     <input disabled ={editFlag ==0?"disabled":""}  type="text" value={request.customerName} onChange={this.handleInput.bind(this,"customerName")}/> 
                                 </li>
                                 <li className="user-info-item">
-                                    <label>客户电话</label>
+                                    <label>客户电话：</label>
                                     <input disabled ={editFlag ==0?"disabled":""}  type="text" value={request.customerPhone} onChange={this.handleInput.bind(this,"customerPhone")}/> 
                                 </li>
                                 <li>
-                                    <label>收货地址</label>
+                                    <label>收货地址：</label>
                                     <input disabled ={editFlag ==0?"disabled":""} className="lab"  type="text" value={request.deliveryAddress} onChange={this.handleInput.bind(this,"deliveryAddress")}/> 
                                 </li>
                             </ul>
@@ -202,7 +365,7 @@ class OrderForm extends React.Component{
 
                     }
 
-                    <div className="receipt-body">
+                    <div className={editFlag ==0?"receipt-body active":"receipt-body"}>
                         <div  className={dataType == 1?"receipt-left receipt-item":"receipt-left-0 receipt-item"}>                   
         {dataType == 0?(<table>
                             <thead>
@@ -210,6 +373,7 @@ class OrderForm extends React.Component{
                                     <td>商品名称</td>
                                     <td>货号</td>
                                     <td>数量</td>
+                                    {editFlag ==0?"":<td><RUI.Button className="primary" onClick= {this.addSonItem}>添加一行</RUI.Button></td>}
                                 </tr>
                             </thead>
                             <tbody>
@@ -217,19 +381,19 @@ class OrderForm extends React.Component{
                                     return(
                                         <tr key={someIndex}>
                                             <td>
-                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productName} onChange={this.listChange.bind(this,"productName",someIndex)}/>
+                                                <input  disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productName} onChange={this.listChange.bind(this,"productName",someIndex)}/>
                                             </td>
                                             <td>
                                                 <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.artNo} onChange={this.listChange.bind(this,"artNo",someIndex)}/>
                                             </td> 
                                             <td>
-                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
-                                            </td>                                   
+                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum+"双"} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
+                                            </td>
+                                            {editFlag ==0?"":<td><RUI.Button onClick={this.removeSonItem.bind(this,someIndex)}>删除</RUI.Button></td>}                                  
                                         </tr>
                                     )
                                 })                               
                             }
-
                             </tbody>
                         </table>
                         ):(
@@ -254,13 +418,13 @@ class OrderForm extends React.Component{
                                                 <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.artNo} onChange={this.listChange.bind(this,"artNo",someIndex)}/>
                                             </td> 
                                             <td>
-                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
+                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum+"双"} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
                                             </td>
                                             <td>
                                                 <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productPrice} onChange={this.listChange.bind(this,"productPrice",someIndex)}/>
                                             </td>  
                                             <td>
-                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productPrice*someItem.productNum}/>
+                                                <input readOnly type="text" value={someItem.totalMoney}/>
                                             </td>                                     
                                         </tr>
                                     )
@@ -269,7 +433,7 @@ class OrderForm extends React.Component{
                             </tbody>
                         </table>)
                         }
-                        <p className="receipt-total">合计{request.totalNum}</p>
+                        <p className="receipt-total">合<span></span>计<span></span>{request.totalNum+"双"}</p>
                     </div>
                     { dataType ==1 &&
                     <div className="receipt-center receipt-item">
@@ -291,18 +455,18 @@ class OrderForm extends React.Component{
                             <tbody>
                                { sumData.moneyList.map((someItem,someIndex)=>{
                                    return(
-                                <tr>
-                                    <td>{someItem.b}</td>
-                                    <td>{someItem.m}</td>
-                                    <td>{someItem.w}</td>
-                                    <td>{someItem.q}</td>
-                                    <td>{someItem.h}</td>
-                                    <td>{someItem.t}</td>
-                                    <td>{someItem.y}</td>
-                                    <td>{someItem.j}</td>
-                                    <td>{someItem.f}</td>
-                                </tr>
-                                )
+                                        <tr key={someIndex}>
+                                            <td>{someItem[0]}</td>
+                                            <td>{someItem[1]}</td>
+                                            <td>{someItem[2]}</td>
+                                            <td>{someItem[3]}</td>
+                                            <td>{someItem[4]}</td>
+                                            <td>{someItem[5]}</td>
+                                            <td>{someItem[6]}</td>
+                                            <td>{someItem[7]}</td>
+                                            <td>{someItem[8]}</td>
+                                        </tr>
+                                    )
                                 })
                             }
                             </tbody>
@@ -321,21 +485,21 @@ class OrderForm extends React.Component{
                 <div className="receipt-item receipt-bottom-total">
                     <ul>
                         <li>人民币</li>
-                        <li>佰</li>
-                        <li>拾</li>
-                        <li>万</li>
-                        <li>仟</li>
-                        <li>佰</li>
-                        <li>拾</li>
-                        <li>元</li>
-                        <li>角</li>
-                        <li>分</li>
+                        <li><span className="c-gray">{request.totalMoneyB[0]}</span>&nbsp;&nbsp;佰</li>
+                        <li><span className="c-gray">{request.totalMoneyB[1]}</span>&nbsp;&nbsp;拾</li>
+                        <li><span className="c-gray">{request.totalMoneyB[2]}</span>&nbsp;&nbsp;万</li>
+                        <li><span className="c-gray">{request.totalMoneyB[3]}</span>&nbsp;&nbsp;仟</li>
+                        <li><span className="c-gray">{request.totalMoneyB[4]}</span>&nbsp;&nbsp;佰</li>
+                        <li><span className="c-gray">{request.totalMoneyB[5]}</span>&nbsp;&nbsp;拾</li>
+                        <li><span className="c-gray">{request.totalMoneyB[6]}</span>&nbsp;&nbsp;元</li>
+                        <li><span className="c-gray">{request.totalMoneyB[7]}</span>&nbsp;&nbsp;角</li>
+                        <li><span className="c-gray">{request.totalMoneyB[8]}</span>&nbsp;&nbsp;分</li>
                     </ul>
                 </div>
                 <div className="receipt-item receipt-bottom-money">
                     <ul>
                         <li>¥</li>
-                        <li></li>
+                        <li className="c-gray">{request.totalMoney}</li>
                     </ul>
                 </div>
             </div>
@@ -347,15 +511,16 @@ class OrderForm extends React.Component{
             </div>
             <div className="receipt-seal">
                 <span>单位盖章</span>
-                <span>开票人：</span>
+                <span>开票人：{sumData.createBy}</span>
                 <span>送货人：</span>
             </div>
         </div>
-        <div className="m-t-30 not-print">
+        <div className="m-t-30 no-print center-btn">
             <RUI.Button className = "cancel-btn" onClick = {()=>{history.go(-1)}}>取消</RUI.Button>
-            <RUI.Button className = "primary" onClick = {this.submit} >打印</RUI.Button>
+            {editFlag ==0 &&<RUI.Button className = "primary" onClick = {this.submit.bind(this)} >打印</RUI.Button>}
             {createBtn}
-        </div>
+            {dataType == 1 &&<RUI.Button className = "primary" onClick = {this.senMsg.bind(this)} >短信通知客户</RUI.Button>}
+        </div>        
     </Layout>
         )
     }

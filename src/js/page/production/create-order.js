@@ -114,7 +114,6 @@ export default class Order extends React.Component{
         let {list} = this.state;
         list.splice(index,1);
         this.setState({list});
-        console.log(list)
     }
     clickImg(){}
     handleChange(type,e){
@@ -243,24 +242,29 @@ export default class Order extends React.Component{
             <Layout currentKey = "8" defaultOpen={"2"} bread = {["生产管理","生产订单"]}>
                 <div className="order-div">
                     <h3>{query.id?"修改订单":"创建订单"}</h3>
-                    
-                    <LabelInput value = {request.orderName} onChange = {this.handleChange.bind(this,"orderName")} label="订单名称：" require = {true}/>
-                    <LabelInput value = {request.customerName} onChange = {this.handleChange.bind(this,"customerName")} label="客户名称：" require = {true}/>
-                    <LabelInput value = {request.customerPhone} onChange = {this.handleChange.bind(this,"customerPhone")} label="客户电话：" require = {true}/>
-                    <LabelArea label="收货地址："value = {request.deliveryAddress} onChange = {this.handleChange.bind(this,"deliveryAddress")} require = {true}/>                   
-                    <LabelSelect
-                        require = {true}
-                        label = "是否加急："
-                        data = {[{key:"是",value:1},{key:"否",value:2}]}
-                        callback = {this.select}
-                        default = {defaultSelect}/>
-                    <LabelDate
-                        value = {request.deliveryTime}
-                        defaultValue = {request.deliveryTime}
-                        require = {true}
-                        label = "交货时间："
-                        onChange = {this.dateChange.bind(this)}
-                    />
+                    <div className="order-btn">
+                        <LabelInput value = {request.orderName} onChange = {this.handleChange.bind(this,"orderName")} label="订单名称：" require = {true}/>
+                        <LabelInput value = {request.customerName} onChange = {this.handleChange.bind(this,"customerName")} label="客户名称：" require = {true}/>
+                    </div>
+                    <div className="order-btn">
+                        <LabelSelect
+                            require = {true}
+                            label = "是否加急："
+                            data = {[{key:"是",value:1},{key:"否",value:2}]}
+                            callback = {this.select}
+                            default = {defaultSelect}/>    
+                        <LabelInput value = {request.customerPhone} onChange = {this.handleChange.bind(this,"customerPhone")} label="客户电话：" require = {true}/>
+                    </div>
+                    <div className="order-btn">
+                        <LabelDate
+                                value = {request.deliveryTime}
+                                defaultValue = {request.deliveryTime}
+                                require = {true}
+                                label = "交货时间："
+                                onChange = {this.dateChange.bind(this)}
+                            />    
+                        <LabelArea label="收货地址："value = {request.deliveryAddress} onChange = {this.handleChange.bind(this,"deliveryAddress")} require = {true}/>                   
+                    </div>
                     <div className="m-t-10">
                         <RUI.Checkbox selected = {request.smsIsOpen==1?1:0} onChange = {this.checkSms}>是否发送短信</RUI.Checkbox>
                         <RUI.Checkbox selected = {request.isCreatDeliveryNote==1?1:0} onChange = {this.checkCreatDeliveryNote}>是否创建送货单</RUI.Checkbox>                        

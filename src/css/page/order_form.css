@@ -7,9 +7,12 @@ ul{
     list-style: none;
 }
 .receipt-content input{
-    width: 100%;
+    width: 95%;
     padding: 5px;
+    background: #fff;
+    color: rgba(0,0,0,.6)
 }
+
 .receipt-content .lab{
     width: 500px;
 }
@@ -35,8 +38,8 @@ ul{
 }
 .receipt-num{
     position: absolute;
-    top:0;
-    right: 0;
+    top:20px;
+    right: 30px;
 }
 .receipt-body{
     border-top: 1px solid #000;
@@ -44,18 +47,28 @@ ul{
 .receipt-body{
     overflow: hidden;
 }
+.receipt-body.active input{
+    text-align: center;
+}
 .receipt-top{
     position: relative;
+    margin-bottom: 10px;
+    padding-left: 10px;
 }
 .receipt-top-0{
     position: relative; 
+    margin-bottom: 10px;
+    padding-left: 10px;
 }
 .receipt-date{
     position: absolute;
     width: 200px;
-    top:0;
-    right: 80px;
+    bottom:0;
+    right: 30px;
     overflow: auto;
+}
+.user-info input{
+    font-size: 12px;
 }
 .receipt-date li{
     float: left;
@@ -74,6 +87,8 @@ ul{
 }
 .user-info-item input{
     width: 320px;
+    background: #fff;
+    color: rgba(0,0,0,.6);
 }
 .receipt-item{
     float: left;
@@ -83,6 +98,7 @@ ul{
 }
 .receipt-left-0{
     width: 600px;
+    
 }
 .receipt-left table{
     width: 100%;
@@ -112,10 +128,13 @@ ul{
 .receipt-total{
     padding: 7px 0  7px 100px;
     text-align: left;
-    letter-spacing: 150px;
     border-left: 1px solid #000;
     border-right: 1px solid #000;
     border-bottom: 1px solid #000;
+}
+.receipt-total span{
+    display: inline-block;
+    width: 100px;
 }
 .receipt-center{
     width: 200px;
@@ -129,26 +148,14 @@ ul{
 }
 .receipt-center table tr{
     height: 36px;
-    line-height: 36px;
     text-align: center;
     border-bottom: 1px solid #000;
 }
 .receipt-center table tr td{
-
     border-right: 1px solid #000;
 }
-
-.receipt-center ul li p{
-    height: 25px;
-    text-align: center;
-    border-bottom: 1px solid #000;
-}
-.receipt-center ul li p:first-child{
-    height: 18px;
-    line-height: 18px;
-}
-.receipt-center ul li p:last-child{
-    border-bottom: none;
+.receipt-center table tbody{
+    color: rgba(0,0,0,.6);
 }
 .receipt-extra{
     height: 17px;
@@ -160,22 +167,25 @@ ul{
 }
 .receipt-right{
     width: 100px;
-    border-bottom: 1px solid #000;
+    color: rgba(0,0,0,.6);
+    border-right: 1px solid #000;
 }
 .receipt-right-0{
     width: 200px;
     border-right: 1px solid #000;
-    border-bottom: 1px solid #000;
+    
 }
 .receipt-remark{
     height: 36px;
     border-bottom: 1px solid #000;
     text-align: center;
     line-height: 36px;
-    letter-spacing: 50px;
 }
 .receipt-remark-content{
+    padding: 1px;
+    box-sizing: border-box;
     height: 215px;
+    border-bottom: 1px solid #000;
 }
 .receipt-remark-content textarea{
     width: 100%;
@@ -184,6 +194,11 @@ ul{
 .receipt-bottom{
     height: 40px;
     border-bottom: 1px solid #000;
+    border-left: 1px solid #000;
+    border-right: 1px solid #000;
+}
+.c-gray{
+    color: rgba(0,0,0,.6);
 }
 .receipt-bottom-total{
     width: 500px;
@@ -224,10 +239,15 @@ ul{
     text-align: left;
     border-bottom: 1px solid #000;
 }
+.receipt-contact{
+    margin-top: 10px;
+    padding-left: 10px;
+}
 .receipt-phone{
     margin-left: 240px;
 }
 .receipt-seal{
+    text-align: center;
     height: 50px;
     line-height: 50px;
 }
@@ -235,4 +255,21 @@ ul{
     display: inline-block;
     width: 180px;
 }
-
+@media print{
+    .no-print{
+        display: none;
+    }
+    .right-page{
+        margin: 0 auto;
+    }
+}
+.order_active {
+    background-color: #369 !important;
+    border-color: #369 !important;
+}
+.next-btn{
+    width: 240px;
+}
+.center-btn{   
+  text-align: center;
+}

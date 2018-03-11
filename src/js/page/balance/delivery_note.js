@@ -19,8 +19,8 @@ const Depart = React.createClass({
                 orderNo:"",
                 orderName:"",
                 customerName:"",
-                startTime:moment(new Date()-86400*30*1000).format("YYYY-MM-DD"),
-                endTime:moment(new Date()).format("YYYY-MM-DD"),
+                startTime:moment(new Date()-86400*30*1000).format("YYYY-MM-DD")+" 00:00:00",
+                endTime:moment(new Date()).format("YYYY-MM-DD")+" 23:59:59",
                 balanceStatus:""
             },
             pager:{
@@ -38,7 +38,9 @@ const Depart = React.createClass({
             smsIsOpen:1,
             confirmMsg:"",
             confirmUrl:"",
-            currListItem:{}
+            currListItem:{},
+            totalNum:"",
+            totalMoney:""
         }
     },
     componentDidMount(){
@@ -46,9 +48,7 @@ const Depart = React.createClass({
     },
     getList(pageNo=1){
         let _this = this;
-        let {pager,listRequest} = this.state;
-        listRequest.startTime = listRequest.startTime +" 00:00:00";
-        listRequest.endTime = listRequest.endTime +" 23:59:59";
+        let {pager,listRequest,totalMoney,totalNum} = this.state;
         $.ajax({
             url:commonBaseUrl+"/balance/findBalanceList.htm",
             type:"get",
@@ -58,10 +58,15 @@ const Depart = React.createClass({
                 if(data.success){
                     pager.currentPage = pageNo;
                     pager.totalNum = data.resultMap.iTotalDisplayRecords;
+                    totalMoney = data.resultMap.sumMoney;
+                    totalNum = data.resultMap.sumNum;
                     _this.setState({
                         list : data.resultMap.rows || [],
-                        pager : pager
+                        pager : pager,
+                        totalMoney:totalMoney,
+                        totalNum:totalNum
                     })
+
                 }else{
                     pager.currentPage = 1;
                     pager.totalNum = 0;
@@ -69,6 +74,8 @@ const Depart = React.createClass({
                 }
             }
         });
+        listRequest.startTime = listRequest.startTime;
+        listRequest.endTime = listRequest.endTime;
     },
     create(){
         //hashHistory.push("/stock/query");
@@ -96,6 +103,8 @@ const Depart = React.createClass({
                 hashHistory.push("/order/detail?id="+item.orderNo);
                 break;
             case 3:
+                this.settlementChange(item);
+                break;
             case 5:
             case 7:
             case 8:
@@ -113,6 +122,21 @@ const Depart = React.createClass({
         }else{
             hashHistory.push("/order/distribution?id="+item.orderNo+"&type='edit'");
         }
+    },
+    settlementChange(item){
+        let _this = this;
+        $.ajax({
+            url:commonBaseUrl+"/balance/updateStatus.htm",
+            type:"get",
+            dataType:"json",
+            data:{d:JSON.stringify({orderNo:item.orderNo})},
+            success:function(results){
+                if(results.success){
+                    Pubsub.publish("showMsg",["success","操作成功"]);
+                    _this.getList();
+                }
+        }
+    })
     },
     commonHandle(type,item){
         let _this = this;
@@ -217,33 +241,10 @@ const Depart = React.createClass({
         let arr = [{key:"订单详情",value:"1"},{key:"查看",value:"0"}];
         let type = localStorage.type;
         if(type==1){
-            arr.push({key:"修改",value:"2"});
+            arr.push({key:"修改",value:"2"},{key:"结算",value:"3"});
         }else if(type == 2){ //上案
-            if(item.vampStatus ==1){
-                arr.push({key:"修改",value:"2"});
-            }
-            if(item.tailorStatus==0){
-                arr.push({key:"裁剪完成",value:"3"});
-            }
-            if(item.vampStatus==0){
-                arr.push({key:"机车分配",value:"4"});
-            }
-            if(item.tailorStatus==1 && item.vampStatus==1){
-                arr.push({key:"机车完成",value:"5"});
-            }
+
         }else if(type == 3){//下案
-            if(item.soleStatus ==1){
-                arr.push({key:"修改",value:"2"});
-            }
-            if(item.soleStatus==0){
-                arr.push({key:"底工分配",value:"6"});
-            }
-            if(item.soleStatus==1){
-                arr.push({key:"底工完成",value:"7"});
-            }
-            if(item.qcStatus==0 && item.soleStatus==2){
-                arr.push({key:"质检完成",value:"8"});
-            }
         }
         return arr;
     },
@@ -270,16 +271,12 @@ const Depart = React.createClass({
     },
     render(){
         let _this = this;
-        let {pager,list,handleSelect,isUrgent,tailorStatus,vampStatus,soleStatus,qcStatus,smsIsOpen,confirmMsg,listRequest} = this.state;
+        let {pager,list,handleSelect,isUrgent,tailorStatus,vampStatus,soleStatus,qcStatus,smsIsOpen,confirmMsg,listRequest,totalMoney,totalNum} = this.state;
         let type = localStorage.type;
-        var openKey = 0;
-        switch (type*1){
-            case 1 : openKey = 2;break;
-            case 2 : openKey = 0;break;
-            case 3 : openKey = 1;break;
-        }
+        let superItem = <div className="super-item"><div>总金额：<span className="require">{totalMoney/100}</span></div><div>总双数：<span className="require">{totalNum}</span></div></div>
+        
         return(
-            <Layout currentKey = "10" defaultOpen={openKey+""} bread = {["结算管理","送货单管理"]}>
+            <Layout currentKey ="10" defaultOpen= {"3"}bread = {["结算管理","送货单管理"]}>
                 <div className="depart-content">
                     <div className="tbn-div">
                         <div>                           
@@ -294,23 +291,26 @@ const Depart = React.createClass({
                                 onChange = {this.dateChangeEnd.bind(this)}
                             />
                             <LabelInput value = {listRequest.orderNo} onChange = {this.handleInput.bind(this,"orderNo")} label="订单编号："/>                            
-                            <LabelInput value = {listRequest.customerPhone} onChange = {this.handleInput.bind(this,"customerPhone")} label="客户名称：" />
+                            <LabelInput value = {listRequest.customerName} onChange = {this.handleInput.bind(this,"customerName")} label="客户名称：" />
                             <LabelInput value = {listRequest.orderName} onChange = {this.handleInput.bind(this,"orderName")} label="订单名称：" />
-                            <label>结算状态&nbsp;&nbsp;</label>
-                            <RUI.Select
-                                data={[{key:'全部',value:''}, {key:'已结算',value:'1'}, {key:'未结算',value:'2'}]}
-                                value={isUrgent}
-                                stuff={true}
-                                callback = {this.handleSelect.bind(this,"isUrgent")}
-                                className="rui-theme-1 w-120">
-                            </RUI.Select>
-                            <RUI.Button className="primary" onClick = {this.search}>搜索</RUI.Button>
-                            {
-                                type == 1&&
-                                <RUI.Button className="primary" onClick = {this.create}>创建</RUI.Button>
-                            }
+                            <div className="button-item">
+                                <label>结算状态：&nbsp;&nbsp;</label>
+                                <RUI.Select
+                                    data={[{key:'全部',value:''}, {key:'已结算',value:'1'}, {key:'未结算',value:'0'}]}
+                                    value={listRequest.balanceStatus}
+                                    stuff={true}
+                                    callback = {this.handleSelect.bind(this,"balanceStatus")}
+                                    className="rui-theme-1 w-120">
+                                </RUI.Select>
+                                <RUI.Button className="primary" onClick = {this.search}>搜索</RUI.Button>
+                                {
+                                    type == 1&&
+                                    <RUI.Button className="primary" onClick = {this.create}>创建</RUI.Button>
+                                }
+                            </div>
                         </div>
                     </div>
+                    {type ==1 &&  superItem}
                     <table className="table">
                         <thead>
                         <tr>
@@ -319,7 +319,7 @@ const Depart = React.createClass({
                             <td>客户名称</td>
                             <td>制单时间</td>
                             <td>双数</td>
-                            <td>金额</td>
+                            { type==1 ?<td>金额</td>:""}
                             <td>结算状态</td>
                             <td>操作方式</td>
                         </tr>
@@ -328,6 +328,9 @@ const Depart = React.createClass({
                         {
                             list.map((item,index)=>{
                                 let selectData = _this.getSelectList(item);
+                                if(item.balanceStatus == 1 ){
+                                    selectData.pop()
+                                }
                                 return(
                                     <tr key = {index}>
                                         <td>{item.orderNo}</td>
@@ -335,9 +338,7 @@ const Depart = React.createClass({
                                         <td>{item.customerName}</td>
                                         <td>{item.createReceiptTime ==undefined?"":item.createReceiptTime }</td>
                                         <td>{item.totalNum}</td>
-
-
-                                        <td>{item.totalMoney}</td>
+                                        {type==1?<td>{item.totalMoney/100}</td>:""}
                                         <td>{item.balanceStatus== 0?"未结算":"已结算"}</td>
                                         <td>
                                             <RUI.Select data = {selectData}
