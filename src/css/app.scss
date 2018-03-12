@@ -59,3 +59,22 @@ ul{
 .ant-calendar-picker-container{
     z-index: 99999 !important;
 }
+.table-content{
+    position: relative;
+}
+.out-in{    
+    position: relative;
+    height: 35px;
+}
+.out-item{
+    position: absolute;
+    top: 0;
+    right: 170px;
+    width: 150px;
+}
+.in-item{
+    position: absolute;
+    top: 0;
+    right: 10px;
+    width: 150px;
+}

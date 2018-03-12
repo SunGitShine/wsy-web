@@ -29,6 +29,7 @@ module.exports = {
         //跨域的反向代理
         proxy:{
             '/':{
+                // target:'http://172.30.22.121:8080',
                 target:'http://119.37.12.43:168',
                 changeOrigin:true,
                 // pathRewrite:{

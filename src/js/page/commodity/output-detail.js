@@ -31,7 +31,9 @@ const Detail = React.createClass({
             type : 1,//1==出库，2==入库
             list :[],
             stockDetail :[],
-            currList:{}
+            currList:{},
+            outNum:"",
+            inNum:""
         }
     },
     componentDidMount(){
@@ -48,7 +50,7 @@ const Detail = React.createClass({
     },
     getList(pageNo=1){
         let _this = this;
-        let {pager,listRequest} = this.state;
+        let {pager,listRequest,outNum,inNum} = this.state;
         let query = this.props.location.query;
         let request = $.extend(true,{},listRequest);
         request.startTime = request.startTime + " 00:00:00";
@@ -63,9 +65,13 @@ const Detail = React.createClass({
                 if(data.success){
                     pager.currentPage = pageNo;
                     pager.totalNum = data.resultMap.iTotalDisplayRecords;
+                    inNum = data.resultMap.inputNum;
+                    outNum = data.resultMap.outputNum;
                     _this.setState({
                         list : data.resultMap.rows,
-                        pager : pager
+                        pager : pager,
+                        inNum:inNum,
+                        outNum:outNum
                     })
                 }else{
                     pager.currentPage = 1;
@@ -129,7 +135,7 @@ const Detail = React.createClass({
     render(){
         let query = this.props.location.query;
         let detailType = query.type;
-        let {productSelect,pager,list,stockDetail,type,currList,listRequest } = this.state;
+        let {productSelect,pager,list,stockDetail,type,currList,listRequest,outNum,inNum } = this.state;
         let loginType = localStorage.type;
         var openKey = 0;
         switch (loginType*1){
@@ -174,47 +180,54 @@ const Detail = React.createClass({
                         <RUI.Input onChange = {this.inputChange.bind(this,"createUser")} className = "w-150 "/>
                         <RUI.Button className="primary" onClick = {this.search}>搜索</RUI.Button>
                     </div>
-                    <table className="table">
-                        <thead>
-                        <tr>
+                    <div className="out-in">
+                        <div className="out-item">出库数量：&nbsp;&nbsp;<span className="require">{outNum}</span></div>
+                        <div className="in-item">入库数量：&nbsp;&nbsp;<span className="require">{inNum}</span></div>
+                    </div>
+                    <div className="table-content">
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    {
+                                        detailType!=1 &&
+                                        <td>产品名称</td>
+                                    }
+                                    <td>库存操作</td>
+                                    <td>操作日期</td>
+                                    <td>操作人</td>
+                                    <td>操作数量</td>
+                                    <td>库存总量</td>
+                                    <td>备注</td>
+                                    <td>操作方式</td>
+                                </tr>
+                            </thead>
+                            <tbody>
                             {
-                                detailType!=1 &&
-                                <td>产品名称</td>
+                                list.length>0 && list.map((item,index)=>{
+                                    return(
+                                        <tr key = {index}>
+                                            {
+                                                detailType!=1 &&
+                                                <td>{item.productName}</td>
+                                            }
+                                            <td>{item.type==1?"出库":"入库"}</td>
+                                            <td>{item.createTime}</td>
+                                            <td>{item.createUser}</td>
+                                            <td>{item.storeOperateNum}</td>
+                                            <td>{item.storeAfterNum}</td>
+                                            <td>{item.remak}</td>
+                                            <td>
+                                                <a href="javascript:;" className="handle-a" onClick = {this.detail.bind(this,item)}>明细</a>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
                             }
-                            <td>库存操作</td>
-                            <td>操作日期</td>
-                            <td>操作人</td>
-                            <td>操作数量</td>
-                            <td>库存总量</td>
-                            <td>备注</td>
-                            <td>操作方式</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            list.length>0 && list.map((item,index)=>{
-                                return(
-                                    <tr key = {index}>
-                                        {
-                                            detailType!=1 &&
-                                            <td>{item.productName}</td>
-                                        }
-                                        <td>{item.type==1?"出库":"入库"}</td>
-                                        <td>{item.createTime}</td>
-                                        <td>{item.createUser}</td>
-                                        <td>{item.storeOperateNum}</td>
-                                        <td>{item.storeAfterNum}</td>
-                                        <td>{item.remak}</td>
-                                        <td>
-                                            <a href="javascript:;" className="handle-a" onClick = {this.detail.bind(this,item)}>明细</a>
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        }
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+
                     {
                         list.length==0 && <div className="no-data">暂时没有数据哦</div>
                     }

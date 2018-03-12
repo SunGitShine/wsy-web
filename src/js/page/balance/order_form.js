@@ -8,14 +8,6 @@ class OrderForm extends React.Component{
         super(props)
         let opType = this.props.location.query.opType;
         opType = parseInt(opType);
-        let moneyNo = ["","","","","","","","",""];
-        let productsItem = {
-            productName:"",
-            productNum:"",
-            artNo:"",
-            totalMoney:"",
-            productPrice:""
-        };
         this.state = {
             roleFlag:localStorage.type,
             dataType:0,
@@ -36,34 +28,6 @@ class OrderForm extends React.Component{
                         artNo:"",
                         totalMoney:"",
                         productPrice:""
-                    },
-                    {
-                        productName:"",
-                        productNum:"",
-                        artNo:"",
-                        totalMoney:"",
-                        productPrice:""
-                    },
-                    {
-                        productName:"",
-                        productNum:"",
-                        artNo:"",
-                        totalMoney:"",
-                        productPrice:""
-                    },
-                    {
-                        productName:"",
-                        productNum:"",
-                        artNo:"",
-                        totalMoney:"",
-                        productPrice:""
-                    },
-                    {
-                        productName:"",
-                        productNum:"",
-                        artNo:"",
-                        totalMoney:"",
-                        productPrice:""
                     }
                 ]
             },
@@ -72,11 +36,8 @@ class OrderForm extends React.Component{
                 sumMoney:"",
                 moneyList:[
                     ["","","","","","","","",""],
-                    ["","","","","","","","",""],
-                    ["","","","","","","","",""],
-                    ["","","","","","","","",""],
-                    ["","","","","","","","",""],
-                    ["","","","","","","","",""]],
+                    ["","","","","","","","",""]
+                ],
                 createBy:""
             }
         }
@@ -87,7 +48,17 @@ class OrderForm extends React.Component{
         let {editFlag} = this.state;
         if(editFlag !== 2){
             this.getorderFormList();
-        }       
+        }     
+    }
+    componentDidMount(){
+        let {dataType }= this.state;
+        let h;
+        if(dataType == 0){
+            h = $(".receipt-left-0").height()-39;
+        }else{
+            h = $(".receipt-left").height()-39;
+        }
+        $(".receipt-remark-content").height(h); 
     }
     typeSwitch(dataType0){
         let dataType = this.state ;
@@ -116,12 +87,21 @@ class OrderForm extends React.Component{
                     request.products = data.resultMap.receiptDO.products;
                     request.totalMoney = data.resultMap.receiptDO.totalMoney;
                     for(let i = 0 ;i<request.products.length;i++){
-                        sumData.moneyList.push(request.products[i].totalMoney);
+                        if(request.products[i].totalMoney == null){
+                            sumData.moneyList.push("");
+                        }else{
+                            sumData.moneyList.push(request.products[i].totalMoney);
+                        }                     
                         request.products[i].productPrice = request.products[i].productPrice/100;
-                        request.products[i].totalMoney = request.products[i].totalMoney/100;
+                        request.products[i].productNum = request.products[i].productNum+"双";
+                        // request.products[i].totalMoney = request.products[i].totalMoney/100 ;
                     }
-                    let time = moment(data.resultMap.receiptDO.createTime);
-                    sumData.times=[time.years(),time.months()+1,time.dates()];
+                    if(data.resultMap.receiptDO.createReceiptTime == null){
+                        sumData.times = ""
+                    }else{
+                        let time = moment(data.resultMap.receiptDO.createReceiptTime);
+                        sumData.times=[time.years(),time.months()+1,time.dates()];
+                    }
                     sumData.createBy = data.resultMap.receiptDO.createUser;
                     for(let j = 0;j<sumData.moneyList.length;j++){
                         var lenth = (sumData.moneyList[j]+"").length;
@@ -206,17 +186,23 @@ class OrderForm extends React.Component{
     updateData(){
         let {request} = this.state;
         let url ="/balance/editReceipt.htm";
+        let phReg =/^1[34578]\d{9}$/;
         let arr = [];
         for(let i = 0;i<request.products.length;i++){
             if(request.products[i].productName !== "" && request.products[i].productNum !== ""){
                 request.products[i].productPrice = parseInt(request.products[i].productPrice)*100;
+                request.products[i].productNum = (request.products[i].productNum+"").replace(/双/g,"");
                 arr.push(request.products[i]);
-            }else if(request.products[i].productName !== "" || request.products[i].productNum !== ""){
+            }else if(request.products[i].productName == "" || request.products[i].productNum == ""){
                 Pubsub.publish("showMsg",["wrong","名称和数量为必填项"]);
-                return;
+                return false;
             }
         }
         request.products = arr;
+        if(!phReg.test (request.customerPhone)){
+            Pubsub.publish("showMsg",["wrong","电话格式不正确"]);
+            return false;
+        }
         $.post(commonBaseUrl+url,{d:JSON.stringify(request)},function (results) {
             if(results.success){
                 Pubsub.publish("showMsg",["success","操作成功"]);               
@@ -231,17 +217,23 @@ class OrderForm extends React.Component{
     createData(){
         let {request} = this.state;
         let url = "/balance/creatReceipt.htm";
+        let phReg =/^1[34578]\d{9}$/;
         let arr = [];
         for(let i = 0;i<request.products.length;i++){
             if(request.products[i].productName !== "" && request.products[i].productNum !== ""){
                 request.products[i].productPrice = parseInt(request.products[i].productPrice)*100;
+                request.products[i].productNum = (request.products[i].productNum+"").replace(/双/g,"");
                 arr.push(request.products[i]);
-            }else if(request.products[i].productName !== "" || request.products[i].productNum !== ""){
+            }else if(request.products[i].productName == "" || request.products[i].productNum == ""){
                 Pubsub.publish("showMsg",["wrong","名称和数量为必填项"]);
-                return;
+                return false;
             }
         }
         request.products = arr;
+        if(!phReg.test (request.customerPhone)){
+            Pubsub.publish("showMsg",["wrong","电话格式不正确"]);
+            return false;
+        }
         $.post(commonBaseUrl+url,{d:JSON.stringify(request)},function (results) {
             if(results.success){
                 Pubsub.publish("showMsg",["success","操作成功"]);
@@ -259,7 +251,11 @@ class OrderForm extends React.Component{
     }
     listChange(type,someIndex,e){
         let {request} = this.state;
-        request.products[someIndex][type] = e.target.value; 
+        let vl = e.target.value;
+        if(type == "productNum"){
+            vl = (vl+"").replace(/双/g,"");
+        }
+        request.products[someIndex][type] = vl; 
         this.setState({});
     }
     addSonItem(){
@@ -323,7 +319,7 @@ class OrderForm extends React.Component{
                 <div id="printPage" className={editFlag ==0?"receipt-content active":"receipt-content"}>
                     <div className="receipt-title">
                         {dataType == 0 ? (<p>舞思韵送货单</p>) : (<p>舞思韵收款收据</p>)}
-                        <span className="receipt-num"><span style={{fontSize:18}}>NO.</span>{+request.orderNo}</span>
+                        <span className="receipt-num"><span style={{fontSize:18}}>NO.</span>{request.orderNo}</span>
                     </div>
                     {   dataType == 1?
                         (<div className="receipt-top">
@@ -373,7 +369,7 @@ class OrderForm extends React.Component{
                                     <td>商品名称</td>
                                     <td>货号</td>
                                     <td>数量</td>
-                                    {editFlag ==0?"":<td><RUI.Button className="primary" onClick= {this.addSonItem}>添加一行</RUI.Button></td>}
+                                    {editFlag ==0?"":<td style={{width:100}}><RUI.Button className="primary" onClick= {this.addSonItem}>添加一行</RUI.Button></td>}
                                 </tr>
                             </thead>
                             <tbody>
@@ -387,7 +383,7 @@ class OrderForm extends React.Component{
                                                 <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.artNo} onChange={this.listChange.bind(this,"artNo",someIndex)}/>
                                             </td> 
                                             <td>
-                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum+"双"} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
+                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
                                             </td>
                                             {editFlag ==0?"":<td><RUI.Button onClick={this.removeSonItem.bind(this,someIndex)}>删除</RUI.Button></td>}                                  
                                         </tr>
@@ -404,7 +400,7 @@ class OrderForm extends React.Component{
                                     <td>货号</td>
                                     <td>数量</td>
                                     <td>单价</td>
-                                    <td>合计</td>
+                                    {editFlag ==0?"":<td style={{width:100}}><RUI.Button className="primary" onClick= {this.addSonItem}>添加一行</RUI.Button></td>}
                                 </tr>
                             </thead>
                             <tbody>
@@ -418,14 +414,12 @@ class OrderForm extends React.Component{
                                                 <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.artNo} onChange={this.listChange.bind(this,"artNo",someIndex)}/>
                                             </td> 
                                             <td>
-                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum+"双"} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
+                                                <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productNum} onChange={this.listChange.bind(this,"productNum",someIndex)}/>
                                             </td>
                                             <td>
                                                 <input disabled ={editFlag ==0?"disabled":""} type="text" value={someItem.productPrice} onChange={this.listChange.bind(this,"productPrice",someIndex)}/>
-                                            </td>  
-                                            <td>
-                                                <input readOnly type="text" value={someItem.totalMoney}/>
-                                            </td>                                     
+                                            </td>
+                                            {editFlag ==0?"":<td><RUI.Button onClick={this.removeSonItem.bind(this,someIndex)}>删除</RUI.Button></td>}                                       
                                         </tr>
                                     )
                                 })                               

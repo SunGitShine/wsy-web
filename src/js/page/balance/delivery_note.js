@@ -84,6 +84,23 @@ const Depart = React.createClass({
     getVampType(type){
         return arr1[type*1];
     },
+    checkOrder(item){
+        $.ajax({
+            url:commonBaseUrl+"/balance/isExistOrder.htm",
+            type:"get",
+            dataType:"json",
+            data:{d:JSON.stringify({"orderNo":item.orderNo})},
+            success:function(results){
+                if(results.success){
+                    if(results.resultMap.isExistOrder == "1"){
+                        hashHistory.push("/order/detail?id="+item.orderNo);
+                    }else{
+                        Pubsub.publish("showMsg",["success","不能存在此订单"]);
+                    }                  
+                }
+            }
+        })
+    },
     handleListSelect(item,e){
         let value = e.value;
         switch(value*1){
@@ -100,7 +117,8 @@ const Depart = React.createClass({
                 hashHistory.push("/orderForm?id="+item.orderNo+"&limit="+localStorage.type);
                 break;
             case 1:
-                hashHistory.push("/order/detail?id="+item.orderNo);
+                this.checkOrder(item);
+                // hashHistory.push("/order/detail?id="+item.orderNo);
                 break;
             case 3:
                 this.settlementChange(item);
