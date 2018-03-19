@@ -24,9 +24,9 @@ const Header = React.createClass({
     },
     render(){
         return(
-            <div className="no-print">
+            <div className="no-print header-bar">
                 <div className="header-div ">
-                    {/* <h1>舞思韵后台管理系统</h1>  */}
+                    <h1>舞思韵后台管理系统</h1> 
                 </div>
                 <div className="header-bread">
                     <Breadcrumb className = "line-50">

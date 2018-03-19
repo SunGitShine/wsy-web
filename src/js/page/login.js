@@ -41,9 +41,14 @@ const Login = React.createClass({
                     localStorage.userName = userName;
                     localStorage.password = password;
                     switch (type*1){
+                        // 超级管理员
                         case 1 : path = "/depart";break;
+                        // 上案
                         case 2 : path = "/production/order";break;
-                        case 3 : path = "/stock";break;
+                        // 下案
+                        case 3 : path = "/production/order";break;
+                        // 质检
+                        // 库存管理
                     }
                     hashHistory.push(path);
                 }else{

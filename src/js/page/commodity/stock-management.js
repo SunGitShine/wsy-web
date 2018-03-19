@@ -155,6 +155,10 @@ const Depart = React.createClass({
         let detail = $.extend(true,[],stockDetail);
         outputRequest.productStoreVOs = stockDetail;
         outputRequest.productName = currList.name;
+        if(outputRequest.remak == ""){
+            Pubsub.publish("showMsg",["wrong","备注不能为空"]);
+            return false;
+        }
         $.ajax({
            url:commonBaseUrl + "/store/inputOrOutput.htm",
             type:"post",
@@ -399,7 +403,7 @@ const Depart = React.createClass({
                                 </table>
                                 <div className="m-t-10">
                                     <label htmlFor="" className="left-label left">备注：</label>
-                                    <RUI.Textarea onChange = {this.handleInput.bind(this,"remak")}   className ="w-245"/>
+                                    <RUI.Textarea onChange = {this.handleInput.bind(this,"remak")} require  className ="w-245"/>
                                 </div>
                             </div>
                         </div>

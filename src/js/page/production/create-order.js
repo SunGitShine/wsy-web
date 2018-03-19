@@ -58,6 +58,7 @@ export default class Order extends React.Component{
         this.select = this.select.bind(this);
         this.submit = this.submit.bind(this);
         this.checkSms = this.checkSms.bind(this);
+        this.checkCreatDeliveryNote = this.checkCreatDeliveryNote.bind(this);
       }
 
     componentDidMount(){

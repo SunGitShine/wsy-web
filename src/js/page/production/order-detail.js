@@ -106,15 +106,15 @@ export default class Detail extends React.Component{
         switch (type*1){
             case 1 : openKey = 2;break;
             case 2 : openKey = 0;break;
-            case 3 : openKey = 1;break;
+            case 3 : openKey = 0;break;
         }
-        if(query.type){
-            openKey = 2;
-            currentKey = 9;
-        }
+        // if(query.type){
+        //     openKey = 2;
+        //     currentKey = 9;
+        // }
         return(
             <Layout currentKey = {currentKey+""} defaultOpen={openKey+""} bread = {["生产管理","生产订单"]}>
-                <div className="order-div print">
+                <div className="order-div">
                     <h3 className="not-print">查看订单</h3>
                     <div className="p-l-100">
                         <div className="m-b-20 not-print">

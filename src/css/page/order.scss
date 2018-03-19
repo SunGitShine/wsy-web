@@ -52,22 +52,26 @@
   }
   .order-div{
     width: 100%;
-    position: absolute;
-    left: 0;
-    top:0;
-    padding:0
+    padding-top: 20px;
+    // position: absolute;
+    // left: 0;
+    // top:0;
+    // padding:0
+  }
+  .right-page{
+    margin: 0 auto;
   }
   .nav-div{
     visibility: hidden;
   }
   .header-div{
-    visibility: hidden;
+   display: none;
   }
   .header-bread{
-    visibility: hidden;
+    display: none;
   }
   .not-print{
-    visibility: hidden;
+    display: none;
   }
   .login-out{
     visibility: hidden;
@@ -80,6 +84,9 @@
   }
   .m-b-20{
     margin-bottom: 0;
+  }
+  .p-l-100{
+    padding-left: 0;
   }
   .upload-img{
     height:200px;

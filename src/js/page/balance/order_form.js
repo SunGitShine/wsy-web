@@ -3,6 +3,7 @@ import Layout from "../../components/layout";
 import {hashHistory,Link } from 'react-router';
 import Pubsub from "../../util/pubsub";
 import moment from 'moment';
+
 class OrderForm extends React.Component{
     constructor(props){
         super(props)
@@ -21,6 +22,7 @@ class OrderForm extends React.Component{
                 totalMoney:"",
                 totalMoneyB:"",
                 totalNum:"",
+                memo:"",
                 products:[
                     {
                         productName:"",
@@ -54,9 +56,9 @@ class OrderForm extends React.Component{
         let {dataType }= this.state;
         let h;
         if(dataType == 0){
-            h = $(".receipt-left-0").height()-39;
+            h = $(".receipt-left-0").height()-46;
         }else{
-            h = $(".receipt-left").height()-39;
+            h = $(".receipt-left").height()-46;
         }
         $(".receipt-remark-content").height(h); 
     }
@@ -78,6 +80,7 @@ class OrderForm extends React.Component{
             success(data){
                 if(data.success){
                     let mLenth = 9;
+                    let time ;
                     request.customerName = data.resultMap.receiptDO.customerName;
                     request.customerPhone = data.resultMap.receiptDO.customerPhone;
                     request.deliveryAddress = data.resultMap.receiptDO.deliveryAddress;
@@ -86,20 +89,22 @@ class OrderForm extends React.Component{
                     request.totalNum = data.resultMap.receiptDO.totalNum;
                     request.products = data.resultMap.receiptDO.products;
                     request.totalMoney = data.resultMap.receiptDO.totalMoney;
+                    request.memo = data.resultMap.receiptDO.memo;
                     for(let i = 0 ;i<request.products.length;i++){
                         if(request.products[i].totalMoney == null){
                             sumData.moneyList.push("");
                         }else{
                             sumData.moneyList.push(request.products[i].totalMoney);
                         }                     
-                        request.products[i].productPrice = request.products[i].productPrice/100;
+                        request.products[i].productPrice = request.products[i].productPrice/100 +"元";
                         request.products[i].productNum = request.products[i].productNum+"双";
                         // request.products[i].totalMoney = request.products[i].totalMoney/100 ;
                     }
                     if(data.resultMap.receiptDO.createReceiptTime == null){
-                        sumData.times = ""
+                        time = moment(new Date());
+                        sumData.times = [time.years(),time.months()+1,time.dates()];
                     }else{
-                        let time = moment(data.resultMap.receiptDO.createReceiptTime);
+                        time = moment(data.resultMap.receiptDO.createReceiptTime);
                         sumData.times=[time.years(),time.months()+1,time.dates()];
                     }
                     sumData.createBy = data.resultMap.receiptDO.createUser;
@@ -161,9 +166,9 @@ class OrderForm extends React.Component{
         let {dataType }= this.state;
         let h;
         if(dataType == 0){
-            h = $(".receipt-left-0").height()-39;
+            h = $(".receipt-left-0").height()-46;
         }else{
-            h = $(".receipt-left").height()-39;
+            h = $(".receipt-left").height()-46;
         }
         $(".receipt-remark-content").height(h);
     }
@@ -190,7 +195,7 @@ class OrderForm extends React.Component{
         let arr = [];
         for(let i = 0;i<request.products.length;i++){
             if(request.products[i].productName !== "" && request.products[i].productNum !== ""){
-                request.products[i].productPrice = parseInt(request.products[i].productPrice)*100;
+                request.products[i].productPrice = parseInt((request.products[i].productPrice+"").replace(/元/g,""))*100;
                 request.products[i].productNum = (request.products[i].productNum+"").replace(/双/g,"");
                 arr.push(request.products[i]);
             }else if(request.products[i].productName == "" || request.products[i].productNum == ""){
@@ -201,6 +206,10 @@ class OrderForm extends React.Component{
         request.products = arr;
         if(!phReg.test (request.customerPhone)){
             Pubsub.publish("showMsg",["wrong","电话格式不正确"]);
+            return false;
+        }
+        if(request.customerName =="" || request.deliveryAddress =="" || request.orderName == ""){
+            Pubsub.publish("showMsg",["wrong","订单名称、客户名称、地址不能为空"]);
             return false;
         }
         $.post(commonBaseUrl+url,{d:JSON.stringify(request)},function (results) {
@@ -218,10 +227,11 @@ class OrderForm extends React.Component{
         let {request} = this.state;
         let url = "/balance/creatReceipt.htm";
         let phReg =/^1[34578]\d{9}$/;
+        let num = /^$/
         let arr = [];
         for(let i = 0;i<request.products.length;i++){
-            if(request.products[i].productName !== "" && request.products[i].productNum !== ""){
-                request.products[i].productPrice = parseInt(request.products[i].productPrice)*100;
+            if(request.products[i].productName !== "" && request.products[i].productNum !== "" ){
+                request.products[i].productPrice = parseInt((request.products[i].productPrice+"").replace(/元/g,""))*100;
                 request.products[i].productNum = (request.products[i].productNum+"").replace(/双/g,"");
                 arr.push(request.products[i]);
             }else if(request.products[i].productName == "" || request.products[i].productNum == ""){
@@ -232,6 +242,10 @@ class OrderForm extends React.Component{
         request.products = arr;
         if(!phReg.test (request.customerPhone)){
             Pubsub.publish("showMsg",["wrong","电话格式不正确"]);
+            return false;
+        }
+        if(request.customerName =="" || request.deliveryAddress =="" || request.orderName == ""){
+            Pubsub.publish("showMsg",["wrong","订单名称、客户名称、地址不能为空"]);
             return false;
         }
         $.post(commonBaseUrl+url,{d:JSON.stringify(request)},function (results) {
@@ -254,6 +268,9 @@ class OrderForm extends React.Component{
         let vl = e.target.value;
         if(type == "productNum"){
             vl = (vl+"").replace(/双/g,"");
+        }
+        if(type == "productPrice"){
+            vl = (vl+"").replace(/元/g,"");
         }
         request.products[someIndex][type] = vl; 
         this.setState({});
@@ -298,6 +315,12 @@ class OrderForm extends React.Component{
         let {request,dataType,editFlag,sumData,roleFlag} = this.state;
         let orderNo = request.orderNo;
         let createBtn;
+        let defaultKey;
+        if(typeFlag ==1){
+            defaultKey = "3"
+        }else if(typeFlag == 5){
+            defaultKey = "1"
+        }
         if(editFlag == 0){
             createBtn = "";            
         }else if(editFlag == 1){
@@ -308,13 +331,14 @@ class OrderForm extends React.Component{
         let fontSize = "18px;";
         return(
             
-            <Layout currentKey = "10" defaultOpen={"3"} bread = {["结算管理","送货单管理"]}>
+            <Layout currentKey = "10" defaultOpen={defaultKey} bread = {["结算管理","送货单管理"]}>
                
                 <div className="m-b-20 no-print center-btn">
-                    <RUI.Button className = {dataType ==1?"primary next-btn":"primary next-btn order_active"}
+                { roleFlag == 1 &&
+                <section><RUI.Button className = {dataType ==1?"primary next-btn":"primary next-btn order_active"}
                                         onClick = {this.typeSwitch.bind(this,1)}>送货单</RUI.Button>
-                   { roleFlag == 1 &&<RUI.Button className = {dataType ==1?"primary next-btn order_active":"primary next-btn "}
-                                        onClick = {this.typeSwitch.bind(this,0)}>收据</RUI.Button>}
+                   <RUI.Button className = {dataType ==1?"primary next-btn order_active":"primary next-btn "}
+                onClick = {this.typeSwitch.bind(this,0)}>收据</RUI.Button></section>}
                 </div>
                 <div id="printPage" className={editFlag ==0?"receipt-content active":"receipt-content"}>
                     <div className="receipt-title">
@@ -470,7 +494,7 @@ class OrderForm extends React.Component{
                 <div className={dataType == 1?"receipt-right receipt-item":"receipt-right-0 receipt-item"}>
                     <p className="receipt-remark">备注</p>
                     <div className="receipt-remark-content">
-                        <textarea ></textarea>
+                        <textarea disabled ={editFlag ==0?"disabled":""} value={request.memo} onChange={this.handleInput.bind(this,"memo")}></textarea>
                     </div>
                 </div>
             </div>
@@ -504,7 +528,7 @@ class OrderForm extends React.Component{
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;15828401115</span>
             </div>
             <div className="receipt-seal">
-                <span>单位盖章</span>
+                <span>收货人：</span>
                 <span>开票人：{sumData.createBy}</span>
                 <span>送货人：</span>
             </div>

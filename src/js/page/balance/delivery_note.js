@@ -263,6 +263,8 @@ const Depart = React.createClass({
         }else if(type == 2){ //上案
 
         }else if(type == 3){//下案
+        }else if(type == 5){
+            arr.push({key:"修改",value:"2"});
         }
         return arr;
     },
@@ -292,9 +294,20 @@ const Depart = React.createClass({
         let {pager,list,handleSelect,isUrgent,tailorStatus,vampStatus,soleStatus,qcStatus,smsIsOpen,confirmMsg,listRequest,totalMoney,totalNum} = this.state;
         let type = localStorage.type;
         let superItem = <div className="super-item"><div>总金额：<span className="require">{totalMoney/100}</span></div><div>总双数：<span className="require">{totalNum}</span></div></div>
+        let defaultKey,createBtn ;
+        if(type ==1){
+            defaultKey = "3"
+        }else if(type == 5){
+            defaultKey = "1"
+        }
+        if(type == 1 || type ==5){
+            createBtn = <RUI.Button className="primary" onClick = {this.create}>创建</RUI.Button>;
+        }else{
+            createBtn = "";
+        }
         
         return(
-            <Layout currentKey ="10" defaultOpen= {"3"}bread = {["结算管理","送货单管理"]}>
+            <Layout currentKey ="10" defaultOpen= {defaultKey}bread = {["结算管理","送货单管理"]}>
                 <div className="depart-content">
                     <div className="tbn-div">
                         <div>                           
@@ -321,10 +334,7 @@ const Depart = React.createClass({
                                     className="rui-theme-1 w-120">
                                 </RUI.Select>
                                 <RUI.Button className="primary" onClick = {this.search}>搜索</RUI.Button>
-                                {
-                                    type == 1&&
-                                    <RUI.Button className="primary" onClick = {this.create}>创建</RUI.Button>
-                                }
+                                {createBtn}
                             </div>
                         </div>
                     </div>
@@ -346,7 +356,7 @@ const Depart = React.createClass({
                         {
                             list.map((item,index)=>{
                                 let selectData = _this.getSelectList(item);
-                                if(item.balanceStatus == 1 ){
+                                if(item.balanceStatus == 1 && type ==1){
                                     selectData.pop()
                                 }
                                 return(

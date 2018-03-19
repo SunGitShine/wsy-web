@@ -257,7 +257,7 @@ const Depart = React.createClass({
         switch (type*1){
             case 1 : openKey = 2;break;
             case 2 : openKey = 0;break;
-            case 3 : openKey = 1;break;
+            case 3 : openKey = 0;break;
         }
         return(
             <Layout currentKey = "8" defaultOpen={openKey+""} bread = {["生产管理","生产订单"]}>

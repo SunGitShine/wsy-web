@@ -21,7 +21,7 @@
   position: absolute;
   height: 60px;
   width: 100px;
-  right: 0;
+  right: 180px;
   top: 0;
   line-height: 60px;
   a{
@@ -52,4 +52,12 @@
 }
 .right-page{
   margin-left: 182px;
+  margin-top: 110px;
+}
+.header-bar{
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  width: 100%;
+  background: #fff;
 }
