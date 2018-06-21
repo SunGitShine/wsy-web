@@ -21,6 +21,13 @@ const Depart = React.createClass({
                 soleStatus:"",
                 qcStatus:"",
             },
+            localStatus:{
+                isUrgentKey:"",
+                tailorStatusKey:"",
+                vampStatusKey:"",
+                soleStatusKey:"",
+                qcStatusKey:"",
+            },
             pager:{
                 currentPage:1,
                 pageSize:10,
@@ -41,6 +48,42 @@ const Depart = React.createClass({
     },
     componentDidMount(){
         this.getList();
+    },
+    componentWillMount(){
+        let {listRequest,localStatus} = this.state;
+        if(window.sessionStorage.getItem('p_orderNo')){
+            listRequest['orderNo'] = window.sessionStorage.getItem('p_orderNo');
+        }
+        if(window.sessionStorage.getItem('p_orderName')){
+            listRequest['orderName'] = window.sessionStorage.getItem('p_orderName');
+
+        }
+        if(window.sessionStorage.getItem('p_isUrgent') !== undefined&& window.sessionStorage.getItem('p_isUrgentKey')){
+            listRequest['isUrgent'] = window.sessionStorage.getItem('p_isUrgent');
+            localStatus['isUrgentKey'] = JSON.parse(window.sessionStorage.getItem('p_isUrgentKey'));
+
+        }
+        if(window.sessionStorage.getItem('p_tailorStatus')!== undefined && window.sessionStorage.getItem('p_tailorStatusKey')){
+            listRequest['tailorStatus'] = window.sessionStorage.getItem('p_tailorStatus');
+            localStatus['tailorStatusKey'] = JSON.parse(window.sessionStorage.getItem('p_tailorStatusKey'));
+
+        }
+        if(window.sessionStorage.getItem('p_vampStatus') !== undefined && window.sessionStorage.getItem('p_vampStatusKey')){
+            listRequest['vampStatus'] = window.sessionStorage.getItem('p_vampStatus');
+            localStatus['vampStatusKey'] = JSON.parse(window.sessionStorage.getItem('p_vampStatusKey'));
+        }
+        if(window.sessionStorage.getItem('p_soleStatus')!== undefined &&window.sessionStorage.getItem('p_soleStatusKey')){
+            listRequest['soleStatus'] =window.sessionStorage.getItem('p_soleStatus');
+            localStatus['soleStatusKey'] = JSON.parse(window.sessionStorage.getItem('p_soleStatusKey'));
+
+        }
+        if(window.sessionStorage.getItem('p_qcStatus') !== undefined && window.sessionStorage.getItem('p_qcStatusKey')){
+            listRequest['qcStatus'] =window.sessionStorage.getItem('p_qcStatus');
+            localStatus['qcStatusKey'] = JSON.parse(window.sessionStorage.getItem('p_qcStatusKey'));
+        }
+        this.setState({},()=>{
+
+        });
     },
     getList(pageNo=1){
         let _this = this;
@@ -98,7 +141,7 @@ const Depart = React.createClass({
         }
     },
     modify(item){
-        let type = localStorage.type;
+        let type = sessionStorage.type;
         if(type==1){
             hashHistory.push("/production/createOrder?id="+item.orderNo);
         }else{
@@ -182,6 +225,22 @@ const Depart = React.createClass({
     handleSelect(type,e){
         let {listRequest} = this.state;
         listRequest[type] = e.value;
+        if(type === 'isUrgent'){
+            window.sessionStorage.setItem('p_isUrgent',e.value);
+            window.sessionStorage.setItem('p_isUrgentKey',JSON.stringify(e));
+        }else if(type === 'tailorStatus'){
+            window.sessionStorage.setItem('p_tailorStatus',e.value);
+            window.sessionStorage.setItem('p_tailorStatusKey',JSON.stringify(e));
+        }else if(type === 'vampStatus'){
+            window.sessionStorage.setItem('p_vampStatus',e.value);
+            window.sessionStorage.setItem('p_vampStatusKey',JSON.stringify(e));
+        }else if(type === 'soleStatus'){
+            window.sessionStorage.setItem('p_soleStatus',e.value);
+            window.sessionStorage.setItem('p_soleStatusKey',JSON.stringify(e));
+        }else if(type === 'qcStatus'){
+            window.sessionStorage.setItem('p_qcStatus',e.value);
+            window.sessionStorage.setItem('p_qcStatusKey',JSON.stringify(e));
+        }
         this.state[type] = e;
         this.setState({},()=>{
             this.getList();
@@ -190,13 +249,18 @@ const Depart = React.createClass({
     handleInput(type,e){
         let {listRequest} = this.state;
         listRequest[type] = e.target.value;
+        if(type === 'orderNo'){
+            window.sessionStorage.setItem('p_orderNo',e.target.value);
+        }else if(type === 'orderName'){
+            window.sessionStorage.setItem('p_orderName',e.target.value);
+        }
     },
     search(){
         this.getList();
     },
     getSelectList(item){
         let arr = [{key:"查看",value:"1"}];
-        let type = localStorage.type;
+        let type = sessionStorage.type;
         if(type==1){
             arr.push({key:"修改",value:"2"},{key:"删除",value:"9"});
         }else if(type == 2){ //上案
@@ -251,8 +315,12 @@ const Depart = React.createClass({
     },
     render(){
         let _this = this;
-        let {pager,list,handleSelect,isUrgent,tailorStatus,vampStatus,soleStatus,qcStatus,smsIsOpen,confirmMsg} = this.state;
-        let type = localStorage.type;
+        let {pager,list,handleSelect,
+            isUrgent,tailorStatus,vampStatus,soleStatus,qcStatus,
+            listRequest,
+            localStatus,
+            smsIsOpen,confirmMsg} = this.state;
+        let type = sessionStorage.type;
         var openKey = 0;
         switch (type*1){
             case 1 : openKey = 2;break;
@@ -265,13 +333,13 @@ const Depart = React.createClass({
                     <div className="tbn-div h-100">
                         <div>
                             <label htmlFor="">订单编号：</label>
-                            <RUI.Input onChange = {this.handleInput.bind(this,"orderNo")} className = "w-150"/>
+                            <RUI.Input value={listRequest.orderNo} onChange = {this.handleInput.bind(this,"orderNo")} className = "w-150"/>
                             <label htmlFor="">订单名称：</label>
-                            <RUI.Input onChange = {this.handleInput.bind(this,"orderName")} className = "w-150"/>
+                            <RUI.Input value={listRequest.orderName} onChange = {this.handleInput.bind(this,"orderName")} className = "w-150"/>
                             <label htmlFor="">加急：</label>
                             <RUI.Select
                                 data={[{key:'全部',value:''}, {key:'是',value:'1'}, {key:'否',value:'2'}]}
-                                value={isUrgent}
+                                value={localStatus.isUrgentKey}
                                 stuff={true}
                                 callback = {this.handleSelect.bind(this,"isUrgent")}
                                 className="rui-theme-1 w-120">
@@ -286,7 +354,7 @@ const Depart = React.createClass({
                             <label htmlFor="">裁剪状态：</label>
                             <RUI.Select
                                 data={[{key:'全部',value:''}, {key:'未处理',value:'0'}, {key:'已完成',value:'1'}]}
-                                value={tailorStatus}
+                                value={localStatus.tailorStatusKey}
                                 stuff={true}
                                 callback = {this.handleSelect.bind(this,"tailorStatus")}
                                 className="rui-theme-1 w-120">
@@ -294,7 +362,7 @@ const Depart = React.createClass({
                             <label htmlFor="">机车状态：</label>
                             <RUI.Select
                                 data={[{key:'全部',value:''}, {key:'未处理',value:'0'}, {key:'处理中',value:'1'}, {key:'已完成',value:'2'}]}
-                                value={vampStatus}
+                                value={localStatus.vampStatusKey}
                                 stuff={true}
                                 callback = {this.handleSelect.bind(this,"vampStatus")}
                                 className="rui-theme-1 w-120">
@@ -302,7 +370,7 @@ const Depart = React.createClass({
                             <label htmlFor="">底工状态：</label>
                             <RUI.Select
                                 data={[{key:'全部',value:''}, {key:'未处理',value:'0'}, {key:'处理中',value:'1'}, {key:'已完成',value:'2'}]}
-                                value={soleStatus}
+                                value={localStatus.soleStatusKey}
                                 stuff={true}
                                 callback = {this.handleSelect.bind(this,"soleStatus")}
                                 className="rui-theme-1 w-120">
@@ -310,7 +378,7 @@ const Depart = React.createClass({
                             <label htmlFor="">质检状态：</label>
                             <RUI.Select
                                 data={[{key:'全部',value:''}, {key:'未处理',value:'0'}, {key:'已完成',value:'1'}]}
-                                value={qcStatus}
+                                value={localStatus.qcStatusKey}
                                 stuff={true}
                                 callback = {this.handleSelect.bind(this,"qcStatus")}
                                 className="rui-theme-1 w-120">

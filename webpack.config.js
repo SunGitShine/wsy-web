@@ -30,7 +30,7 @@ module.exports = {
         proxy:{
             '/':{
                 // target:'http://172.30.22.121:8080',
-                target:'http://119.37.12.43:168',
+                target:'http://www.wusiyunxieye.com',
                 changeOrigin:true,
                 // pathRewrite:{
                 //     '^/api':''

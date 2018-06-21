@@ -265,8 +265,11 @@ ul{
     .right-page{
         margin: 0 auto;
     }
+    .receipt-title p{
+        font-size: 2.8rem;
+    }
     .receipt-content{
-        margin-top: -3rem;
+        margin-top: -2.5rem;
         font-size: 2.5rem;
     }
     .receipt-content input{
@@ -275,8 +278,11 @@ ul{
     .receipt-content label{
         font-size: 2.5rem;
     }
+    .receipt-total{
+        padding: .7rem 0 .7rem 10rem;
+    }
     html{
-        font-size: 6px;
+        font-size: 7px;
     }
 }
 .order_active {

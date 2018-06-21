@@ -43,6 +43,16 @@ const Detail = React.createClass({
         this.getList();
         this.memberLists();
     },
+    componentWillMount(){
+        let {listRequest} = this.state;
+        if(window.sessionStorage.getItem("orderName") !== null){
+            listRequest["orderName"] = window.sessionStorage.getItem("orderName");
+            this.setState({},()=>{
+
+            })
+        }
+
+    },
     getList(pageNo=1){
         let _this = this;
         let {pager,listRequest} = this.state;
@@ -108,9 +118,21 @@ const Detail = React.createClass({
     inputChange(type,e){
         let {listRequest} = this.state;
         listRequest[type] = e.target.value;
+        if(type === "orderName"){
+            window.sessionStorage.setItem("orderName",e.target.value);
+        }
     },
     search(){
         this.getList();
+    },
+    clearSearch(){
+        window.sessionStorage.removeItem("orderName");
+        let {listRequest} = this.state;
+        listRequest["orderName"] ="";
+        this.setState({},()=>{
+            this.getList();
+        })
+
     },
     checkDetail(orderNo){
         hashHistory.push("/order/detail?id="+orderNo+"&type=1");  //type==1表示从订单统计过去的。
@@ -136,7 +158,7 @@ const Detail = React.createClass({
                                      value={[moment(listRequest.startTime, 'YYYY-MM-DD'),moment(listRequest.endTime, 'YYYY-MM-DD')]}
                                     defaultValue={[moment(listRequest.startTime, 'YYYY-MM-DD'),moment(listRequest.endTime, 'YYYY-MM-DD')]}/>
                         <label htmlFor="">订单名称：</label>
-                        <RUI.Input onChange = {this.inputChange.bind(this,"orderName")} className = "w-150"/>
+                        <RUI.Input value = {listRequest.orderName} onChange = {this.inputChange.bind(this,"orderName")} className = "w-150"/>
                         <label htmlFor="" className="">机车员工：</label>
                         <RUI.Select
                             data={jcSelect}
@@ -154,6 +176,7 @@ const Detail = React.createClass({
                             className="rui-theme-1 w-120 ">
                         </RUI.Select>
                         <RUI.Button className="primary" onClick = {this.search}>搜索</RUI.Button>
+                        <RUI.Button className="primary" onClick = {this.clearSearch}>清空搜索</RUI.Button>
                     </div>
                     <table className="table">
                         <thead>

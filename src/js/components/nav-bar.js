@@ -78,9 +78,10 @@ const Nav = React.createClass({
         let path = currObj.path;
         this.setState({
            currentKey: e.key,
-            defaultOpen : key
+           defaultOpen : key
         },()=>{
             hashHistory.push(path);
+
         });
     },
     render(){

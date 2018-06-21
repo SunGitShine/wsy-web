@@ -21,11 +21,12 @@ const Depart = React.createClass({
                 customerName:"",
                 startTime:moment(new Date()-86400*30*1000).format("YYYY-MM-DD")+" 00:00:00",
                 endTime:moment(new Date()).format("YYYY-MM-DD")+" 23:59:59",
-                balanceStatus:""
+                balanceStatus:"",
+                balanceKey:""
             },
             pager:{
                 currentPage:1,
-                pageSize:10,
+                pageSize:20,
                 totalNum:0,
             },
             handleSelect:[{key:"裁剪完成",value:"1"},{key:"机车分配",value:"2"},{key:"机车完成",value:"3"},{key:"查看",value:"4"},{key:"修改",value:"5"},{key:"删除",value:"6"}],
@@ -46,6 +47,36 @@ const Depart = React.createClass({
     componentDidMount(){
         this.getList();
     },
+    componentWillMount(){
+        let {listRequest} = this.state;
+        if(window.sessionStorage.getItem("customerName") !== null){
+            listRequest["customerName"] = window.sessionStorage.getItem("customerName");
+            this.setState({},()=>{
+
+            })
+        }
+        if(window.sessionStorage.getItem("orderNo") !== null){
+            listRequest["orderNo"] = window.sessionStorage.getItem("orderNo");
+            this.setState({},()=>{
+
+            })
+        }
+        if(window.sessionStorage.getItem("orderName") !== null){
+            listRequest["orderName"] = window.sessionStorage.getItem("orderName");
+            this.setState({},()=>{
+
+            })
+        }
+        if(window.sessionStorage.getItem("balanceStatus") !== null){
+            listRequest["balanceStatus"] =window.sessionStorage.getItem("balanceStatus");
+            listRequest["balanceKey"] = JSON.parse(window.sessionStorage.getItem("balanceKey"));
+            this.setState({
+            },()=>{
+
+            })
+        }
+
+    },
     getList(pageNo=1){
         let _this = this;
         let {pager,listRequest,totalMoney,totalNum} = this.state;
@@ -53,7 +84,7 @@ const Depart = React.createClass({
             url:commonBaseUrl+"/balance/findBalanceList.htm",
             type:"get",
             dataType:"json",
-            data:{d:JSON.stringify(listRequest),pageNo:pageNo,pageSize:10},
+            data:{d:JSON.stringify(listRequest),pageNo:pageNo,pageSize:20},
             success(data){
                 if(data.success){
                     pager.currentPage = pageNo;
@@ -74,8 +105,8 @@ const Depart = React.createClass({
                 }
             }
         });
-        listRequest.startTime = listRequest.startTime;
-        listRequest.endTime = listRequest.endTime;
+        // listRequest.startTime = listRequest.startTime;
+        // listRequest.endTime = listRequest.endTime;
     },
     create(){
         //hashHistory.push("/stock/query");
@@ -93,7 +124,7 @@ const Depart = React.createClass({
             success:function(results){
                 if(results.success){
                     if(results.resultMap.isExistOrder == "1"){
-                        hashHistory.push("/order/detail?id="+item.orderNo);
+                        hashHistory.push("/order/detail?id="+item.orderNo+"&from=note");
                     }else{
                         Pubsub.publish("showMsg",["success","不能存在此订单"]);
                     }                  
@@ -232,7 +263,11 @@ const Depart = React.createClass({
     },
     handleSelect(type,e){
         let {listRequest} = this.state;
-        listRequest[type] = e.value;
+        listRequest[type] = e;
+        listRequest["balanceStatus"] = e.value;
+        console.log(e);
+        window.sessionStorage.setItem("balanceStatus",e.value);
+        window.sessionStorage.setItem("balanceKey",JSON.stringify(e));
         this.state[type] = e;
         this.setState({},()=>{
             this.getList();
@@ -241,19 +276,41 @@ const Depart = React.createClass({
     handleInput(type,e){
         let {listRequest} = this.state;
         listRequest[type] = e.target.value;
+        if(type === "customerName"){
+            window.sessionStorage.setItem("customerName",e.target.value);
+        }else if(type === "orderNo"){
+            window.sessionStorage.setItem("orderNo",e.target.value);
+        }else if(type === "orderName"){
+            window.sessionStorage.setItem("orderName",e.target.value);
+        }
     },
     dateChange(e){
         let {listRequest} = this.state;         
-        listRequest.startTime = e;
+        listRequest.startTime = e + " 00:00:00";
         this.setState({});
     },
     dateChangeEnd(e){
         let {listRequest} = this.state;
-        listRequest.endTime = e;
+        listRequest.endTime = e +" 23:59:59";
         this.setState({});
     },
     search(){
         this.getList();
+    },
+    clearSearch(){
+        window.sessionStorage.removeItem("customerName");
+        window.sessionStorage.removeItem("orderNo");
+        window.sessionStorage.removeItem("orderName");
+        window.sessionStorage.removeItem("balanceStatus");
+        let {listRequest} = this.state;
+        listRequest["customerName"] ="";
+        listRequest["orderNo"] ="";
+        listRequest["orderName"] ="";
+        listRequest["balanceStatus"] ="";
+        this.setState({},()=>{
+            this.getList();
+        })
+
     },
     getSelectList(item){
         let arr = [{key:"订单详情",value:"1"},{key:"查看",value:"0"}];
@@ -307,7 +364,7 @@ const Depart = React.createClass({
         }
         
         return(
-            <Layout currentKey ="10" defaultOpen= {defaultKey}bread = {["结算管理","送货单管理"]}>
+            <Layout currentKey ="10" defaultOpen= {defaultKey} bread = {["结算管理","送货单管理"]}>
                 <div className="depart-content">
                     <div className="tbn-div">
                         <div>                           
@@ -328,12 +385,13 @@ const Depart = React.createClass({
                                 <label>结算状态：&nbsp;&nbsp;</label>
                                 <RUI.Select
                                     data={[{key:'全部',value:''}, {key:'已结算',value:'1'}, {key:'未结算',value:'0'}]}
-                                    value={listRequest.balanceStatus}
+                                    value={listRequest.balanceKey}
                                     stuff={true}
-                                    callback = {this.handleSelect.bind(this,"balanceStatus")}
+                                    callback = {this.handleSelect.bind(this,"balanceKey")}
                                     className="rui-theme-1 w-120">
                                 </RUI.Select>
                                 <RUI.Button className="primary" onClick = {this.search}>搜索</RUI.Button>
+                                <RUI.Button className="primary" onClick = {this.clearSearch}>清空搜索</RUI.Button>
                                 {createBtn}
                             </div>
                         </div>
