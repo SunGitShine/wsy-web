@@ -141,7 +141,7 @@ const Depart = React.createClass({
         }
     },
     modify(item){
-        let type = sessionStorage.type;
+        let type = localStorage.type;
         if(type==1){
             hashHistory.push("/production/createOrder?id="+item.orderNo);
         }else{
@@ -260,7 +260,7 @@ const Depart = React.createClass({
     },
     getSelectList(item){
         let arr = [{key:"查看",value:"1"}];
-        let type = sessionStorage.type;
+        let type = localStorage.type;
         if(type==1){
             arr.push({key:"修改",value:"2"},{key:"删除",value:"9"});
         }else if(type == 2){ //上案
@@ -320,7 +320,7 @@ const Depart = React.createClass({
             listRequest,
             localStatus,
             smsIsOpen,confirmMsg} = this.state;
-        let type = sessionStorage.type;
+        let type = localStorage.type;
         var openKey = 0;
         switch (type*1){
             case 1 : openKey = 2;break;
